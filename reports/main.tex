@@ -13,10 +13,10 @@
 %   - Author
 %
 
-\hwkTitle{HW00}
-\hwkSubTitle{Homework Template}
-\hwkDueDate{2025-09-25}
-\hwkDueTime{09:30:00}
+\hwkTitle{Final Project}
+\hwkSubTitle{Extended Kalman Filter}
+\hwkDueDate{2025-12-16}
+\hwkDueTime{12:30:00}
 \hwkClass{ENAE 441 - 0101}
 \hwkClassTime{09:30:00}
 \hwkInstructor{Dr. Martin}
@@ -29,11 +29,14 @@
 
 \pagebreak
 
-\begin{hwkProblem}{1}{Parts \textit{(\# pts.)}} \label{hwk:p01}
+\begin{hwkProblem}{1}{Problem Setup} \label{hwk:p01}
 
 	\begin{enumerate}[label=\alph*.]
-		\item \label{hwk:p01a} Instructions
-		\item \label{hwk:p01b} Instructions
+		\item \label{hwk:p01a} Express the non-linear system in continuous time state-space form, clearly defining the vectors \( \fn{\bm{f}}[\fn{X}[t]] \) and \( \fn{\bm{h}}[\fn{X}[t]] \)
+		\item \label{hwk:p01b} Define the linearized dynamics and measurement matrices \( \fn{A}[t] \) and \( \fn{C}[t] \).
+		\item \label{hwk:p01c} Show how these matrices are converted to their discrete time forms \( F_{k} \) and \( H_{k} \). Recall \( F_{k} \) is the state transition matrix \( \fn{\bm{\Phi}}[t_{j}, t_{i}] \) which requires integration.
+		\item \label{hwk:p01d} Define your noise matrices \( Q_{k} \) and \( R_{k} \), and discuss their relationship to the aforementioned system of equations.
+		\item \label{hwk:p01e} Plot the measurements as a function of time.
 	\end{enumerate}
 
 	\hwkSol{} \label{hwk:s01}
@@ -46,27 +49,130 @@
 
 	Answer
 
+	\hwkPart{} \label{hwk:s01c}
+
+	Answer
+
+	\hwkPart{} \label{hwk:s01d}
+
+	Answer
+
+	\hwkPart{} \label{hwk:s01e}
+
+	Answer
+
 \end{hwkProblem}
 
-\begin{hwkProblem}{2}{Code \textit{(\# pts.)}} \label{hwk:p02}
+\begin{hwkProblem}{2}{Plan Filter Implementation} \label{hwk:p02}
 
-	Instructions
+	Provide pseudocode from which you will base your extended Kalman filter implementation. Highlight the major steps in your algorithm and any noteworthy modifications or subtle details required for this problem that you want the grades to be aware of. Be comprehensive, as this is what the grading team will primarily reference if the results/plots don't quite look right.
 
 	\hwkSol{} \label{hwk:s02}
 
-	\begin{figure}[H] \label{fig:s02}
-		\begin{center}
-			\includegraphics[width=0.95\textwidth]{./outputs/figures/s02.png}
-		\end{center}
-		\caption{Example}
-	\end{figure}
-
-	\inputminted{python}{./outputs/text/s02.txt}
-
-	\hwkCode{} \label{code:s02}
-
-	See the \href{https://www.github.com/vaisriv/enae441-hw-template/blob/main/src/hw00.py#L10}{Python code} for this assignment.
+	Answer
 
 \end{hwkProblem}
+
+\begin{hwkProblem}{3}{Pure Prediction} \label{hwk:p03}
+
+	\begin{enumerate}[label=\alph*.]
+		\item \label{hwk:p03a}
+		\item \label{hwk:p03b}
+		\item \label{hwk:p03c}
+	\end{enumerate}
+
+	\hwkSol{} \label{hwk:s03}
+
+	\hwkCode{} \label{code:s03}
+
+	See the \href{https://www.github.com/vaisriv/enae441-final/blob/main/src/final.py#L1}{Python code} for this assignment.
+
+\end{hwkProblem}
+
+\begin{hwkProblem}{4}{Measurement Updates} \label{hwk:p04}
+
+	\begin{enumerate}[label=\alph*.]
+		\item \label{hwk:p04a}
+		\item \label{hwk:p04b}
+		\item \label{hwk:p04c}
+	\end{enumerate}
+
+	\hwkSol{} \label{hwk:s04}
+
+	\hwkCode{} \label{code:s04}
+
+	See the \href{https://www.github.com/vaisriv/enae441-final/blob/main/src/final.py#L1}{Python code} for this assignment.
+
+\end{hwkProblem}
+
+\begin{hwkProblem}{5}{Filter Solutions} \label{hwk:p05}
+
+	\begin{enumerate}[label=\alph*.]
+		\item \label{hwk:p05a}
+		\item \label{hwk:p05b}
+		\item \label{hwk:p05c}
+		\item \label{hwk:p05d}
+	\end{enumerate}
+
+	\hwkSol{} \label{hwk:s05}
+
+	\hwkCode{} \label{code:s05}
+
+	See the \href{https://www.github.com/vaisriv/enae441-final/blob/main/src/final.py#L1}{Python code} for this assignment.
+
+\end{hwkProblem}
+
+\begin{hwkProblem}{6}{Debugging Efforts \textit{(Optional)}} \label{hwk:p06}
+
+	Use this section to outline any of your debugging efforts for if things aren't going your way. This is a good place to earn some partial credit. This should be a ``research'' log of what experiments you performed and why. A list of guiding questions if your stuck include:
+	\begin{enumerate}
+		\item Consider how process noise matrix is used in the filter. What happens if there are large gaps between measurements?
+		\item Consider if the values used in your measurement noise matrix are appropriate. Should these values only reflect the uncertainty in the sensor?
+		\item If your filter is diverging, does the divergence start at the beginning or mid-way through? What possible reasons exist for either outcome?
+		\item If you had to define a single scalar metric to evaluate your filter's quality, what would it be, and can you use this to help you determine optimal tuning values?
+		\item Does plotting your best estimate in a different reference frame or element description help?
+	\end{enumerate}
+
+	\hwkSol{} \label{hwk:s06}
+
+	Answer
+
+\end{hwkProblem}
+
+\begin{hwkProblem}{7}{Challenge Orbit \textit{(Bonus)}} \label{hwk:p07}
+
+	Perform a second analysis with the more difficult dataset \mintinline{python}{Project-Measurements-Hard.npy}. Use
+	\[
+		\bvect{
+			a \\
+			e \\
+			i \\
+			\omega \\
+			\Omega \\
+			\theta
+		} = \bvect{
+			\qty{7000}{\km} \\
+			0.6 \\
+			\ang{45} \\
+			\ang{180} \\
+			\ang{0} \\
+			\ang{45}
+		}
+	\]
+	as your initial guess. Your analysis can amount to your debugging process, and points will be awarded based on how thoughtful your experimentation is and the quality of your solution.
+
+	\hwkSol{} \label{hwk:s07}
+
+	Answer
+
+	\hwkCode{} \label{code:s07}
+
+	See the \href{https://www.github.com/vaisriv/enae441-final/blob/main/src/final.py#L1}{Python code} for this assignment.
+
+\end{hwkProblem}
+
+\hwkCode{} \label{code:final}
+
+\inputminted{python}{./src/final.py}
 
 \end{document}
