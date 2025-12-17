@@ -29,7 +29,64 @@
 
 \pagebreak
 
-\begin{hwkProblem}{1}{Problem Setup} \label{hwk:p01}
+\section*{Overview} \label{hwk:overview}
+
+You are working at NASA GSFC on the navigation team for an Earth orbiting science satellite launched into orbit on a Falcon-9. SpaceX designed its launch to deliver the payload into low Earth orbit with reference coordinates of
+
+\[
+	\bm{X}_{\text{\oe}}=\left[\begin{array}{c}
+			a \\
+			e \\
+			i \\
+			\omega \\
+			\Omega \\
+			\theta
+			\end{array}\right]=\left[\begin{array}{cc}
+			\qty{7e3}{\km} \\
+			0.2 \\
+			\ang{45} \\
+			\ang{0} \\
+			\ang{270} \\
+			\ang{78.75}
+	\end{array}\right]
+\]
+
+however it's the navigation's team responsibility to verify this orbit and/or determine any errors in its delivery. To accomplish this, the navigation team has access to range and range-rate measurements from the spacecraft provided by the Deep Space Network (DSN). The latitude and longitude \( \left( \phi, \lambda \right) \) of the three DSN ground stations are provided below:
+\begin{itemize}
+	\item DSN \# 0: Goldstone, USA: \( \left( \ang{35.297}, \ang{-116.914} \right) \)
+	\item DSN \# 1: Madrid, Spain: \( \left( \ang{40.4311}, \ang{-4.248} \right) \)
+	\item DSN \# 2: Canberra, Australia: \( \left( \ang{-35.4023}, \ang{148.9813} \right) \)
+\end{itemize}
+
+These ground stations are positioned on a spherical Earth of radius 6378.137 km , with a rotation rate of \( \omega_{\mathcal{E}/\mathcal{N}} = \qty{7.292115e-5}{\rad\per\s} \) and a Local Sidereal Time of \( \gamma_{0} = \ang{0} \).
+
+\mintinline{python}{Project-Measurements-Easy.npy} contains the range \( \rho \) and range-rate \( \dot{\rho} \) measurements alongside additional information. Specifically, each row in the datafile is formatted as:
+\[
+	\bvect{t, i, \rho, \dot{\rho}}
+\]
+
+where \( t \) corresponds with the time the measurement was received and \( i \) corresponds to the ground station index (as labeled above).
+
+As best as you are aware, the spacecraft's motion is governed by the following differential equation:
+
+\[
+	\ddot{\bm{r}}=-\frac{\bm{\mu}}{r^3} \cdot \bm{r}
+\]
+
+where \( \bm{r} \) is the position of the spacecraft in the inertial frame. Similarly, the measurements provided can be computed using the following equations:
+
+\begin{align*}
+	\bm{\rho} &= \bm{r} - \bm{R}_{\text{site}, i} \\
+	\rho &= \left\| \bm{r} -  \bm{R}_{\text{site}, i} \right\| \\
+	\dot{\rho} &= \frac{\bm{\rho} \left( \bm{\dot{r}} - \bm{\dot{R}}_{\text{site}, i} \right)}{\rho} \\
+	\bm{\dot{R}}_{\text{site}, i} &= \bm{\omega}_{\mathcal{E} / \mathcal{N}} \times \bm{R}_{\text{site}, i}
+\end{align*}
+
+where \( \bm{R}_{\text{site}, i} \) is the location of the DSN station also in the inertial frame. Note that the measurements provided by the DSN have some intrinsic noise which can be modeled as Gaussian white noise. Explicitly, the noise in the range is characterized by a variance of \qty{1}{\m\squared}, and by \qty{1}{\cm\squared\per\s\squared} variance in the range-rate.
+
+Using your knowledge of the spacecraft's dynamics and the measurements provided by the DSN, generate a report which culminates in an estimate of the spacecraft's state over time. To help facilitate your progress, please generate your report in the following order, answering the following intermediate questions:
+
+\begin{hwkProblem*}{1}{Problem Setup} \label{hwk:p01}
 
 	\begin{enumerate}[label=\alph*.]
 		\item \label{hwk:p01a} Express the non-linear system in continuous time state-space form, clearly defining the vectors \( \fn{\bm{f}}[\fn{X}[t]] \) and \( \fn{\bm{h}}[\fn{X}[t]] \)
@@ -61,9 +118,9 @@
 
 	Answer
 
-\end{hwkProblem}
+\end{hwkProblem*}
 
-\begin{hwkProblem}{2}{Plan Filter Implementation} \label{hwk:p02}
+\begin{hwkProblem*}{2}{Plan Filter Implementation} \label{hwk:p02}
 
 	Provide pseudocode from which you will base your extended Kalman filter implementation. Highlight the major steps in your algorithm and any noteworthy modifications or subtle details required for this problem that you want the grades to be aware of. Be comprehensive, as this is what the grading team will primarily reference if the results/plots don't quite look right.
 
@@ -71,9 +128,9 @@
 
 	Answer
 
-\end{hwkProblem}
+\end{hwkProblem*}
 
-\begin{hwkProblem}{3}{Pure Prediction} \label{hwk:p03}
+\begin{hwkProblem*}{3}{Pure Prediction} \label{hwk:p03}
 
 	\begin{enumerate}[label=\alph*.]
 		\item \label{hwk:p03a}
@@ -87,9 +144,9 @@
 
 	See the \href{https://www.github.com/vaisriv/enae441-final/blob/main/src/final.py#L1}{Python code} for this assignment.
 
-\end{hwkProblem}
+\end{hwkProblem*}
 
-\begin{hwkProblem}{4}{Measurement Updates} \label{hwk:p04}
+\begin{hwkProblem*}{4}{Measurement Updates} \label{hwk:p04}
 
 	\begin{enumerate}[label=\alph*.]
 		\item \label{hwk:p04a}
@@ -103,9 +160,9 @@
 
 	See the \href{https://www.github.com/vaisriv/enae441-final/blob/main/src/final.py#L1}{Python code} for this assignment.
 
-\end{hwkProblem}
+\end{hwkProblem*}
 
-\begin{hwkProblem}{5}{Filter Solutions} \label{hwk:p05}
+\begin{hwkProblem*}{5}{Filter Solutions} \label{hwk:p05}
 
 	\begin{enumerate}[label=\alph*.]
 		\item \label{hwk:p05a}
@@ -120,9 +177,9 @@
 
 	See the \href{https://www.github.com/vaisriv/enae441-final/blob/main/src/final.py#L1}{Python code} for this assignment.
 
-\end{hwkProblem}
+\end{hwkProblem*}
 
-\begin{hwkProblem}{6}{Debugging Efforts \textit{(Optional)}} \label{hwk:p06}
+\begin{hwkProblem*}{6}{Debugging Efforts \textit{(Optional)}} \label{hwk:p06}
 
 	Use this section to outline any of your debugging efforts for if things aren't going your way. This is a good place to earn some partial credit. This should be a ``research'' log of what experiments you performed and why. A list of guiding questions if your stuck include:
 	\begin{enumerate}
@@ -137,9 +194,9 @@
 
 	Answer
 
-\end{hwkProblem}
+\end{hwkProblem*}
 
-\begin{hwkProblem}{7}{Challenge Orbit \textit{(Bonus)}} \label{hwk:p07}
+\begin{hwkProblem*}{7}{Challenge Orbit \textit{(Bonus)}} \label{hwk:p07}
 
 	Perform a second analysis with the more difficult dataset \mintinline{python}{Project-Measurements-Hard.npy}. Use
 	\[
@@ -169,9 +226,9 @@
 
 	See the \href{https://www.github.com/vaisriv/enae441-final/blob/main/src/final.py#L1}{Python code} for this assignment.
 
-\end{hwkProblem}
+\end{hwkProblem*}
 
-\hwkCode{} \label{code:final}
+\section*{Code} \label{code:final}
 
 \inputminted{python}{./src/final.py}
 
