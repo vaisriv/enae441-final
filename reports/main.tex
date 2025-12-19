@@ -385,11 +385,44 @@ Using your knowledge of the spacecraft's dynamics and the measurements provided 
 
 	\hwkPart{} \label{hwk:s03a}
 
-	Answer
+	\( \bm{x}_{0} \) is the nominal spacecraft orbit:
+	\[
+		\bm{X}_0^{+} \equiv \bvect{r_{0} \\ v_{0}}
+	\]
+
+	\( P_{0} \) is chosen to be a diagonal covariance matrix, with the first 3 terms being the range noise uncertainty scaled by the tuning ratio:
+	\[
+		\sigma_{r}^{2} = \left(\frac{\sigma_{\rho}}{\sigma_{a}}\right)^{2} = \left(\frac{\num{1e-6}}{\num{1e-9}}\left[\unit{\km}\right]\right)^{2}
+	\]
+	and the final 3 terms being the range-rate noise uncertainty scaled by the tuning ratio:
+	\[
+		\sigma_{v}^{2} = \left(\frac{\sigma_{\dot{\rho}}}{\sigma_{a}}\right)^{2} = \left(\frac{\num{1e-10}}{\num{1e-9}}\left[\unit{\km\per\s}\right]\right)^{2}
+	\]
+
+	\( Q_{0} \) is chosen to be the short-step approximation:
+	\[
+		Q_k \approx q_a\left[\begin{array}{cc}
+				\frac{\Delta t^3}{3} I_3 & \frac{\Delta t^2}{2} I_3 \\
+				\frac{\Delta t^2}{2} I_3 & \Delta t I_3
+		\end{array}\right]
+	\]
+
+	\( R_{0} \) is chosen to be a diagonal covariance matrix, with the first 3 terms being the range noise uncertainty:
+	\[
+		\sigma_{\rho}^{2} = \left(\num{1e-3}\left[\unit{\km}\right]\right)^{2}
+	\]
+	and the final 3 terms being the range-rate noise uncertainty
+	\[
+		\sigma_{\dot{\rho}}^{2} = \left(\num{1e-10}\left[\unit{\km\per\s}\right]\right)^{2}
+	\]
+
+	\inputminted{python}{./outputs/text/s03a.txt}
 
 	\hwkPart{} \label{hwk:s03b}
 
 	Implementation can be viewed in the \hyperref[code:final]{Python files} embedded at the end of the report.
+
+	\pagebreak
 
 	\hwkPart{} \label{hwk:s03c}
 
@@ -397,9 +430,10 @@ Using your knowledge of the spacecraft's dynamics and the measurements provided 
 		\begin{center}
 			\includegraphics[width=0.65\textwidth]{./outputs/figures/s03c.png}
 		\end{center}
-		\caption{Example}
+		\caption{\( \pm 3 \sigma \) Bounds on Covariance \( P_{\bm{\hat{x}}, k}^{-} \) vs. Time \( t \)}
 	\end{figure}
 
+	% TODO: Explanation
 	Answer
 
 \end{hwkProblem*}
@@ -530,6 +564,18 @@ See the \href{https://www.github.com/vaisriv/enae441-final/blob/main/src}{full s
 
 \subsection*{\mintinline{bash}{./src/final.py}}
 \inputminted{python}{./src/final.py}
+
+\subsection*{\mintinline{bash}{./src/p01.py}}
+\inputminted{python}{./src/p01.py}
+
+\subsection*{\mintinline{bash}{./src/p03.py}}
+\inputminted{python}{./src/p03.py}
+
+\subsection*{\mintinline{bash}{./src/helpers/propagators.py}}
+\inputminted{python}{./src/helpers/propagators.py}
+
+\subsection*{\mintinline{bash}{./src/helpers/system.py}}
+\inputminted{python}{./src/helpers/system.py}
 
 \subsection*{\mintinline{bash}{./src/measurements/measurements.py}}
 \inputminted{python}{./src/measurements/measurements.py}

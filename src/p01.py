@@ -5,7 +5,7 @@ import numpy as np
 # src
 from measurements import *
 
-def e(data: measurements.Measurement, file_path: str) -> int:
+def e(data: measurements.Measurement) -> plt.Figure:
     t = np.asarray(data.t)
     i = np.asarray(data.i).astype(int)
     ρ = np.asarray(data.ρ)
@@ -25,16 +25,13 @@ def e(data: measurements.Measurement, file_path: str) -> int:
                 marker=".", markersize=2,
                 color=colors.get(int(stn)),
                 label=labels.get(int(stn), f"DSN #{int(stn)}"))
+        ax.grid(True, alpha=0.3)
+        ax.legend(loc = "upper left")
 
     ax.set_xlabel("Time [s]")
     ax.set_ylabel("Range [km]")
     ax.set_title("DSN Range [km] vs. Time [s]")
 
-    ax.grid(True, alpha=0.3)
-    ax.legend()
+    fig.tight_layout()
 
-    plt.tight_layout()
-    plt.savefig(file_path)
-    # plt.show()
-
-    return 0
+    return fig
