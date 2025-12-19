@@ -1,17 +1,12 @@
 # libs
 import numpy as np
-import os
 
 # src
 from .measurements import *
 
 def raw_load(file_path: str) -> np.ndarray:
-    # cur_dir = os.path.dirname(os.path.abspath(__file__)) + "/"
-    # full_path = cur_dir + file_path
-    full_path = file_path
-
     try:
-        raw_data = np.load(full_path, allow_pickle=True)
+        raw_data = np.load(file_path, allow_pickle=True)
     except NameError:
         print(f"Could not load data from {file_path}")
 

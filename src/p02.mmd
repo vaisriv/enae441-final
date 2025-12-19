@@ -1,0 +1,27 @@
+---
+config:
+  layout: fixed
+---
+flowchart LR
+    A(["Start"]) --> B["Load data: t, i, rho, drho<br>Set constants: mu, RE, omegaE, gamma0<br>Set noise: R, q_a<br>Set initial X0+, P0+"]
+    B --> C["Precompute station ECEF vectors R_ecef[i]"]
+    C --> D["Initialize: X_plus = X0+<br>P_plus = P0+<br>t_prev = t[0]<br>k = 0"]
+    D --> E{"k &lt; N ?"}
+    E -- No --> Z(["End: return estimates + residuals"])
+    E -- Yes --> F["Read measurement k:<br>t_k, i_k, y_k=[rho_k, drho_k]"]
+    F --> G["dt = t_k - t_prev"]
+    G --> H{"dt > 0 ?"}
+    H -- Yes --> I["Propagate X and STM Φ from t_prev→t_k<br>Integrate: Xdot=f(X), Φdot=A(X)Φ"]
+    I --> J["P_minus = Φ P_plus Φ^T + Qk<br>Qk from dt (q_a) or 0"]
+    H -- No --> K["No propagation:<br>X_minus=X_plus<br>P_minus=P_plus<br>Φ=I"]
+    J --> L["Compute station ECI at t_k:<br>R_site=R3(γ)R_ecef<br>Rdot=ω×R_site"]
+    L --> M["Predict measurement:<br>rho=||r-R_site||<br>drho=ûᵀ(v-Rdot)"]
+    M --> N["Compute Hk (2x6) from geometry"]
+    N --> O["Innovation: ν = y_k - ŷ_k"]
+    O --> P["S = Hk P_minus Hk^T + R"]
+    P --> Q["K = P_minus Hk^T S^{-1}"]
+    Q --> R["Update:<br>X_plus = X_minus + Kν"]
+    R --> S["Joseph covariance:<br>P_plus=(I-KH)P_minus(I-KH)^T+KRK^T"]
+    S --> T["Log diagnostics (ν, NIS), set t_prev=t_k, k=k+1"]
+    T --> E
+    K --> L

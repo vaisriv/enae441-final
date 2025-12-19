@@ -252,7 +252,124 @@ Using your knowledge of the spacecraft's dynamics and the measurements provided 
 
 	\hwkSol{} \label{hwk:s02}
 
-	Answer
+	\begin{minted}{python}
+		Inputs:
+			data.t[0..N-1], data.i[0..N-1], data.rho[0..N-1], data.drho[0..N-1]
+			station lat/lon: (phi[i], lam[i]), i=0..2
+			constants: mu, RE, omegaE, gamma0
+			noise: R = diag(sig_rho^2, sig_drho^2)   (in FILTER UNITS)
+			       Q-model params: q_a (white accel PSD) OR set Qk = 0
+			initial: X_plus (6x1), P_plus (6x6)
+
+		Precompute:
+			for each station i:
+				R_ecef[i] = RE * [cos(phi_i)cos(lam_i), cos(phi_i)sin(lam_i), sin(phi_i)]^T
+
+		Helpers:
+			site_eci(i, t):
+				gamma = gamma0 + omegaE*t
+				R_site = R3(gamma) * R_ecef[i]
+				Rdot_site = omega x R_site # (omega = [0,0,omegaE]^T)
+				return (R_site, Rdot_site)
+
+			dynamics(X):
+				r = X[0:3], v = X[3:6]
+				rnorm = ||r||
+				rdot = v
+				vdot = -mu * r / rnorm^3
+				return [rdot; vdot]
+
+			A_matrix(X):
+				r = X[0:3]; rnorm = ||r||
+				I3 = identity(3)
+				dadr = -mu*( (1/rnorm^3)*I3 - (3/rnorm^5)*(r*r^T) )
+				return [[0, I3],
+				        [dadr, 0]]
+
+			propagate_state_and_stm(X0, t0, t1):
+				Integrate coupled ODEs from t0 -> t1:
+				Xdot  = dynamics(X)
+				Phidot = A_matrix(X) * Phi
+				with initial Phi(t0)=I6
+				return (X_minus, Phi)   where Phi = Φ(t1,t0)
+
+			meas_and_jacobian(X, i, t):
+				(R_site, Rdot_site) = site_eci(i, t)
+				r = X[0:3]; v = X[3:6]
+				rho_vec = r - R_site
+				rho = ||rho_vec||
+				u = rho_vec / rho
+				v_rel = v - Rdot_site
+				drho = u^T * v_rel
+
+				yhat = [rho; drho]
+
+				# Jacobian H = ∂h/∂X (2x6)
+				H_rho_r = u^T
+				H_rho_v = [0 0 0]
+
+				H_drho_v = u^T
+				H_drho_r = (1/rho) * (v_rel^T * (I3 - u*u^T))
+
+				H = [[H_rho_r,  H_rho_v],
+				     [H_drho_r, H_drho_v]]
+				return (yhat, H)
+
+			process_noise_discrete(dt, q_a):
+				if q_a == 0:
+					return 0_(6x6)
+				else:
+					I3 = identity(3)
+					Q = q_a * [[(dt^3/3)*I3, (dt^2/2)*I3],
+					           [(dt^2/2)*I3, (dt)*I3]]
+					return Q
+
+		Main EKF:
+			t_prev = data.t[0]
+
+			for k in 0..N-1:
+				t_k = data.t[k]
+				i_k = data.i[k]
+				y_k = [data.rho[k], data.drho[k]]^T
+
+			# Predict / propagate to t_k
+			dt = t_k - t_prev
+			if dt > 0:
+				(X_minus, Phi) = propagate_state_and_stm(X_plus, t_prev, t_k)
+				Qk = process_noise_discrete(dt, q_a)
+				P_minus = Phi * P_plus * Phi^T + Qk
+			else:
+				X_minus = X_plus
+				P_minus = P_plus
+				Phi = I6
+
+			# Measurement prediction at (t_k, i_k)
+			(yhat_k, Hk) = meas_and_jacobian(X_minus, i_k, t_k)
+			nu = y_k - yhat_k # innovation (2x1)
+
+			# Gain computation
+			S = Hk * P_minus * Hk^T + R # (2x2)
+			K = P_minus * Hk^T * inv(S) # (6x2)
+
+			# Update (state + Joseph covariance)
+			X_plus = X_minus + K * nu
+			P_plus = (I6 - K*Hk)*P_minus*(I6 - K*Hk)^T + K*R*K^T
+
+			# Diagnostics
+			log residual nu, NIS = nu^T * inv(S) * nu, etc.
+			t_prev = t_k
+
+		Outputs:
+			filtered state estimates X_plus and X_minus over time
+			residual history, NIS history, covariance history
+	\end{minted}
+
+	\begin{figure}[H] \label{fig:s02}
+		\begin{center}
+			\includegraphics[width=0.95\textwidth]{./outputs/figures/s02.png}
+		\end{center}
+		\caption{(Pseudo) Code Flowchart}
+	\end{figure}
 
 \end{hwkProblem*}
 
