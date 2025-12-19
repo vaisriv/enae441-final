@@ -100,23 +100,149 @@ Using your knowledge of the spacecraft's dynamics and the measurements provided 
 
 	\hwkPart{} \label{hwk:s01a}
 
-	Answer
+	First, we use the inertial Cartesian state:
+	\[
+		\fn{X}[t] \equiv \bvect{\fn{r}[t] \\ \fn{v}[t]} = \bvect{x & y & z & \dot{x} & \dot{y} & \dot{z}}^{T} \in \mathbb{R}^{6}, \quad r, v \in \mathbb{R}^{3}
+	\]
+	And the two-body point mass model:
+	\[
+		\dot{r} = v, \quad \dot{v} = -\mu \frac{r}{\left\| r \right\|^{3}}
+	\]
+	Thus,
+	\[
+		\fn{f}[X, t] = \bvect{v \\ -\mu \frac{r}{\left\| r \right\|^{3}}}
+	\]
+
+	Now, each station's ECEF position is:
+	\[
+		R_{\text{ECEF}, i} = R_{E} \bvect{ \cos{\phi_{i}} \cos{\lambda_{i}} \\ \cos{\phi_{i}} \sin{\lambda_{i}} \\ \sin{\phi_{i}} }
+	\]
+	As Earth rotates about inertial \( + \hat{z} \) with \( \omega_{E} = \omega_{\mathcal{E}/\mathcal{N}} \), siderial angle is:
+	\[
+		\fn{\gamma}[t] = \gamma_{0} + \omega_{E} t
+	\]
+	Rotating to get the Site positions:
+	\[
+		R_{\text{site}, i} = \fn{R_{3}}[\fn{\gamma}[t]] R_{\text{ECEF}, i}, \quad \fn{\dot{R}_{\text{site}, i}}[t] = \omega \times \fn{R_{\text{site}, i}}[t], \quad \omega = \bvect{0 \\ 0 \\ \omega_{E}}
+	\]
+
+	Now, each station's LOS vector is:
+	\[
+		\fn{\rho_{i}}[t] = \fn{r}[t] - \fn{R_{\text{site}, i}}[t], \quad \fn{\rho}[t] = \left\|\fn{\rho_{i}}[t]\right\|, \quad \fn{\hat{\rho}}[t] = \frac{\fn{\rho_{i}}[t]}{\fn{\rho}[t]}
+	\]
+	Range-rate:
+	\[
+		\fn{\dot{\rho}}[t] = \frac{\fn{\rho_{i}^{T}}[v - \dot{R}_{\text{site}, i}]}{\rho} = \fn{\hat{\rho}^{T}}[v - \dot{R}_{\text{site}, i}]
+	\]
+
+	Measurements including noise:
+	\[
+		\fn{y}[t] = \fn{h}[X, t, i] + \fn{v}[t], \quad \fn{v}[t] \sim \fn{\mathcal{N}}[0, R]
+	\]
 
 	\hwkPart{} \label{hwk:s01b}
 
-	Answer
+	With \( \delta X \) as a small perturbation about a refernece trajectory \( \fn{\bar{X}}[t] \),
+	\[
+		\fn{\delta \dot{X}}[t] = \fn{A}[t] \fn{\delta X}[t], \quad \fn{\delta y}[t] = \fn{C}[t] \fn{\delta X}[t] + \fn{v}[t]
+	\]
+	\( \fn{A}[t] \) and \( \fn{C}[t] \) are Jacobians:
+	\[
+		\fn{A}[t] = \left. \pdrv{f}{X} \right|_{\fn{\bar{X}}[t]}, \quad \fn{C}[t] = \left. \pdrv{h}{X} \right|_{\fn{\bar{X}}[t], t, i}
+	\]
+
+	Dynamics Jacobian \( A(t) \):
+
+	With \(r=\bar{r}(t), v=\bar{v}(t), r=\|r\|\),
+	\[
+		A(t) = \bvect{
+			\pdrv{\dot{r}}{r} & \pdrv{\dot{r}}{v} \\
+			\pdrv{\dot{v}}{r} & \pdrv{\dot{v}}{v}
+		} = \bvect{
+			0_{3 \times 3} & I_{3 \times 3} \\
+			-\mu\left(\frac{1}{r^3} I_{3 \times 3}-\frac{3}{r^5} r r^T\right) & 0_{3 \times 3}
+		}
+	\]
+
+	Measurement Jacobian \( C(t) \):
+
+	For a measurement taken at time \( t \) from station \( i \),
+	\[
+		\rho = r-R_{\text{site}, i}(t), \quad \rho = \|\rho\|, \quad u = \hat{\rho} = \rho / \rho, \quad v_{\text{rel}} = v-\dot{R}_{\text{site}, i}(t)
+	\]
+	Range row:
+	\[
+		\pdrv{\rho}{r} = u^T, \quad \pdrv{\rho}{v} = 0_{1 \times 3}
+	\]
+	Range-rate row:
+	\[
+		\dot{\rho}=u^T v_{\text{rel}}
+	\]
+	Using \( \pdrv{u}{r}=\frac{1}{\rho}\left(I-u u^T\right) \) (since \( u=\rho /\|\rho\| \) and \( \rho \) depends linearly on \( r \)),
+	\[
+		\pdrv{\dot{\rho}}{v} = u^T, \quad \pdrv{\dot{\rho}}{r} = v_{\text{rel}}^T \pdrv{u}{r} = \frac{1}{\rho} v_{\text{rel}}^T\left(I-u u^T\right)
+	\]
+	Thus,
+	\[
+		C(t) = \bvect{
+			u^T & 0_{1 \times 3} \\
+			\frac{1}{\rho} v_{\text{rel}}^T\left(I-u u^T\right) & u^T
+		}
+	\]
 
 	\hwkPart{} \label{hwk:s01c}
 
-	Answer
+	Measurements occur at times \( t_k \) (not necessarily uniform), meaning the EKF-style discrete model is:
+	\[
+		X_{k+1} = \varphi\left(X_k, t_k, t_{k+1}\right) + w_k, \quad y_k = h\left(X_k, t_k, i_k\right) + v_k
+	\]
+	The discrete linearized mapping for perturbations is:
+	\[
+		\delta X_{k+1}=F_k \delta X_k, \quad F_k \equiv \Phi\left(t_{k+1}, t_k\right)
+	\]
+	\(\boldsymbol{\Phi}\) is obtained by integrating the variational equation alongside the state:
+	\[
+		\dot{\Phi}\left(t, t_k\right)=A(t) \Phi\left(t, t_k\right), \quad \Phi\left(t_k, t_k\right)=I_{6 \times 6},
+	\]
+	and then setting:
+	\[
+		F_k=\Phi\left(t_{k+1}, t_k\right)
+	\]
+	At measurement time \(t_k\) and station index \(i_k\),
+	\[
+		H_{k} \equiv C(t_{k}) = \left. \pdrv{h}{X} \right|_{\bar{X}(t_{k}), t_{k}, i_{k}}
+	\]
 
 	\hwkPart{} \label{hwk:s01d}
 
-	Answer
+	Measurement noise is simply:
+	\[
+		R_{k} = \bvect{\sigma_{\rho}^{2} & 0 \\ 0 \sigma_{\dot{\rho}}^{2}}
+	\]
+	Process noise is used to account for unmodeled accelerations. Here we choose additive white acceleration noise as our process noise model:
+	\[
+		\dot{r} = v, \quad \dot{v} = -\mu \frac{r}{\|r\|^3} + w_a(t), \quad w_a(t) \sim \mathcal{N}\left(0, Q_c\right),
+	\]
+	with \( Q_c = q_a I_{3 \times 3} \), and simplifying to:
+	\[
+		\dot{X} = f(X, t) + G w_a(t), \quad G = \bvect{
+			0_{3 \times 3} \\
+			I_{3 \times 3}
+		}
+	\]
+	Then the discrete process noise over \( \left[t_k, t_{k+1}\right] \) is
+	\[
+		Q_k=\int_{t_k}^{t_{k+1}} \Phi\left(t_{k+1}, \tau\right) G Q_c G^T \Phi\left(t_{k+1}, \tau\right)^T d \tau
+	\]
 
 	\hwkPart{} \label{hwk:s01e}
 
-	Answer
+	\begin{figure}[H] \label{fig:s01e}
+		\begin{center}
+			\includegraphics[width=0.65\textwidth]{./outputs/figures/s01e.png}
+		\end{center}
+		\caption{DSN Range [\unit{\km}] vs. Time [\unit{\s}]}
+	\end{figure}
 
 \end{hwkProblem*}
 
@@ -133,49 +259,106 @@ Using your knowledge of the spacecraft's dynamics and the measurements provided 
 \begin{hwkProblem*}{3}{Pure Prediction} \label{hwk:p03}
 
 	\begin{enumerate}[label=\alph*.]
-		\item \label{hwk:p03a}
-		\item \label{hwk:p03b}
-		\item \label{hwk:p03c}
+		\item \label{hwk:p03a} Specify your choice of \( \bm{x}_{0} \), \( P_{0} \), \( Q_{0} \), and \( R_{0} \). Explain your reasoning. (For \( \bm{x}_{0} \), express in cartesian coordinates.)
+		\item \label{hwk:p03b} Implement just the prediction step of the extended Kalman Filter (i.e. do not perform measurement updates).
+		\item \label{hwk:p03c} Plot the covariance of the state estimate as a function of time, centered about a mean of zero --- i.e. \( \pm 3 \sigma \) bounds taken from \( \fn{P_{\bm{\hat{x}}, k}^{-}}[t] \). Choose appropriate y-limits for your plot to maximize readability. Explain what you see and if it makes sense.
 	\end{enumerate}
 
 	\hwkSol{} \label{hwk:s03}
 
-	\hwkCode{} \label{code:s03}
+	\hwkPart{} \label{hwk:s03a}
 
-	See the \href{https://www.github.com/vaisriv/enae441-final/blob/main/src/final.py#L1}{Python code} for this assignment.
+	Answer
+
+	\hwkPart{} \label{hwk:s03b}
+
+	Implementation can be viewed in the \hyperref[code:final]{Python files} embedded at the end of the report.
+
+	\hwkPart{} \label{hwk:s03c}
+
+	\begin{figure}[H] \label{fig:s03c}
+		\begin{center}
+			\includegraphics[width=0.65\textwidth]{./outputs/figures/s03c.png}
+		\end{center}
+		\caption{Example}
+	\end{figure}
+
+	Answer
 
 \end{hwkProblem*}
 
 \begin{hwkProblem*}{4}{Measurement Updates} \label{hwk:p04}
 
 	\begin{enumerate}[label=\alph*.]
-		\item \label{hwk:p04a}
-		\item \label{hwk:p04b}
-		\item \label{hwk:p04c}
+		\item \label{hwk:p04a} Implement the measurement update step of the extended Kalman Filter.
+		\item \label{hwk:p04b} Plot the pre- and post-measurement update \( \pm 3 \sigma \) bounds on the same plot. Explain any differences.
+		\item \label{hwk:p04c} Plot the difference between the pre-and post-measurement update state estimates, \( \fn{\bm{\mu}_{\bm{\hat{x}}, k}^{+}}[t_{k}] - \fn{\bm{\mu}_{\bm{\hat{x}}, k}^{-}}[t_{k}] \), inside of the pre-measurement covariance \( \pm 3 \sigma \) bounds \( \fn{P_{\bm{\hat{x}}, k}^{+}}[t_{k}] \).
 	\end{enumerate}
 
 	\hwkSol{} \label{hwk:s04}
 
-	\hwkCode{} \label{code:s04}
+	\hwkPart{} \label{hwk:s04a}
 
-	See the \href{https://www.github.com/vaisriv/enae441-final/blob/main/src/final.py#L1}{Python code} for this assignment.
+	Implementation can be viewed in the \hyperref[code:final]{Python files} embedded at the end of the report.
+
+	\hwkPart{} \label{hwk:s04b}
+
+	\begin{figure}[H] \label{fig:s04b}
+		\begin{center}
+			\includegraphics[width=0.65\textwidth]{./outputs/figures/s04b.png}
+		\end{center}
+		\caption{Example}
+	\end{figure}
+
+	Answer
+
+	\hwkPart{} \label{hwk:s04c}
+
+	\begin{figure}[H] \label{fig:s04c}
+		\begin{center}
+			\includegraphics[width=0.65\textwidth]{./outputs/figures/s04c.png}
+		\end{center}
+		\caption{Example}
+	\end{figure}
 
 \end{hwkProblem*}
 
 \begin{hwkProblem*}{5}{Filter Solutions} \label{hwk:p05}
 
 	\begin{enumerate}[label=\alph*.]
-		\item \label{hwk:p05a}
-		\item \label{hwk:p05b}
-		\item \label{hwk:p05c}
-		\item \label{hwk:p05d}
+		\item \label{hwk:p05a} With your EKF implemented, run the simulation through to completion and compute the post-fit measurement residuals as a function of time via:
+			\[
+				\fn{\delta \bm{Y}}[t_{k}] = \fn{\bm{Y}}[t_{k}] - \fn{h}[\fn{\bm{\mu}_{\bm{\hat{x}}, k}^{+}}[t_{k}]]
+			\]
+		\item \label{hwk:p05b} Do your measurement residuals give you confidence that you estimated the state correctly? Why or why not?
+		\item \label{hwk:p05c} Plot the estimated state \( \fn{\bm{\mu}_{\bm{\hat{x}}, k}^{+}}[t_{k}] \) and its associated \( \pm 3 \sigma \) bounds taken from \( \fn{P_{\bm{\hat{x}}, k}^{+}}[t] \) as a function of time.
+		\item \label{hwk:p05d} Report your best state estimate at the final time-step and its associated uncertainty.
 	\end{enumerate}
 
 	\hwkSol{} \label{hwk:s05}
 
-	\hwkCode{} \label{code:s05}
+	\hwkPart{} \label{hwk:s05a}
 
-	See the \href{https://www.github.com/vaisriv/enae441-final/blob/main/src/final.py#L1}{Python code} for this assignment.
+	Answer
+
+	\hwkPart{} \label{hwk:s05b}
+
+	Answer
+
+	\hwkPart{} \label{hwk:s05c}
+
+	\begin{figure}[H] \label{fig:s05c}
+		\begin{center}
+			\includegraphics[width=0.65\textwidth]{./outputs/figures/s05c.png}
+		\end{center}
+		\caption{Example}
+	\end{figure}
+
+	Answer
+
+	\hwkPart{} \label{hwk:s05d}
+
+	Answer
 
 \end{hwkProblem*}
 
@@ -222,14 +405,19 @@ Using your knowledge of the spacecraft's dynamics and the measurements provided 
 
 	Answer
 
-	\hwkCode{} \label{code:s07}
-
-	See the \href{https://www.github.com/vaisriv/enae441-final/blob/main/src/final.py#L1}{Python code} for this assignment.
-
 \end{hwkProblem*}
 
 \section*{Code} \label{code:final}
 
+See the \href{https://www.github.com/vaisriv/enae441-final/blob/main/src}{full source code} for this project.
+
+\subsection*{\mintinline{bash}{./src/final.py}}
 \inputminted{python}{./src/final.py}
+
+\subsection*{\mintinline{bash}{./src/measurements/measurements.py}}
+\inputminted{python}{./src/measurements/measurements.py}
+
+\subsection*{\mintinline{bash}{./src/measurements/numpy_data.py}}
+\inputminted{python}{./src/measurements/numpy_data.py}
 
 \end{document}

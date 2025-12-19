@@ -1,27 +1,50 @@
+# libs
 import numpy as np
 import matplotlib.pyplot as plt
 import os
 
+# src
+from measurements import *
 
-def main():
-    print("Hello World!")
+def main() -> int:
+    data = numpy_data.load("./data/Project-Measurements-Easy.npy")
 
     #######
-    # p02 #
+    # p01e #
     #######
+    t = np.asarray(data.t)
+    i = np.asarray(data.i).astype(int)
+    ρ = np.asarray(data.ρ)
 
-    x = np.linspace(0, 10, 100)
-    y = np.sin(x)
+    labels = {0: "DSN #0 Goldstone", 1: "DSN #1 Madrid", 2: "DSN #2 Canberra"}
+    colors = {0: "r", 1: "g", 2: "b"}
 
-    with open("./outputs/text/s02.txt", "w", encoding="utf-8") as f:
-        f.write((f"x:\n{x}\n\ny:\n{y}"))
+    order = np.argsort(t)
+    t, i, ρ = t[order], i[order], ρ[order]
 
-    plt.figure()
-    plt.plot(x, y)
+    fig, ax = plt.subplots()
 
-    save_path = os.path.join(os.path.dirname(__file__), "./outputs/figures/s02.png")
+    for stn in np.unique(i):
+        mask = (i == stn)
+        ax.plot(t[mask], ρ[mask],
+                linestyle="-", linewidth=0,
+                marker=".", markersize=2,
+                color=colors.get(int(stn)),
+                label=labels.get(int(stn), f"DSN #{int(stn)}"))
+
+    ax.set_xlabel("Time [s]")
+    ax.set_ylabel("Range [km]")
+    ax.set_title("DSN Range [km] vs. Time [s]")
+
+    ax.grid(True, alpha=0.3)
+    ax.legend()
+
+    plt.tight_layout()
+    save_path = os.path.join(os.path.dirname(__file__), "./outputs/figures/s01e.png")
     plt.savefig(save_path)
-    plt.show()
+    # plt.show()
+
+    return 0
 
 
 if __name__ == "__main__":
