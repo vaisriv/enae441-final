@@ -18,9 +18,9 @@ def coe2rv(oe: list, μ:float) -> [np.ndarray, np.ndarray]:
     v_pf = np.sqrt(μ/p) * np.array([-np.sin(ν), e + np.cos(ν), 0.0])
 
     # Rotation from PQW -> ECI (3-1-3 sequence)
-    R_pqw_eci = sp.spatial.transform.Rotation.from_euler("ZXZ", [-ω, -i, -Ω])
-    r = r_pf @ R_pqw_eci.as_matrix()
-    v = v_pf @ R_pqw_eci.as_matrix()
+    R_pqw_eci = sp.spatial.transform.Rotation.from_euler("ZXZ", [Ω, i, ω])
+    r = R_pqw_eci.as_matrix() @ r_pf
+    v = R_pqw_eci.as_matrix() @ v_pf
 
     return r, v
 
@@ -79,7 +79,7 @@ def site_eci(station_idx: int, t: float, R_ecef: dict, OMEGA_E: float, GAMMA0: f
     γ = GAMMA0 + OMEGA_E * t
     ω = np.array([0.0, 0.0, OMEGA_E])
 
-    R_ecef_eci = sp.spatial.transform.Rotation.from_euler("Z", -γ)
+    R_ecef_eci = sp.spatial.transform.Rotation.from_euler("Z", γ)
     R_site = R_ecef_eci.as_matrix() @ R_ecef[int(station_idx)]
 
     dR_site = np.cross(ω, R_site)
@@ -104,8 +104,8 @@ def meas_and_jacobian(X: list, station_idx: int, t: float, R_ecef: dict, OMEGA_E
     # H (2x6)
     H_ρ_r = u.reshape(1,3)
     H_ρ_v = np.zeros((1,3))
-    H_dρ_v = u.reshape(1,3)
     H_dρ_r = (1.0/ρ) * (v_rel.reshape(1,3) @ (I3 - np.outer(u, u)))
+    H_dρ_v = u.reshape(1,3)
 
     H = np.block([
         [H_ρ_r,  H_ρ_v],

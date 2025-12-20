@@ -1,0 +1,3 @@
+Post-fit RMS range residual: 0.970 [m]
+Post-fit RMS range-rate residual: 0.817 [cm/s]
+Mean pre-fit NIS (df=2): 1.950

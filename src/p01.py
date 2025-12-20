@@ -6,10 +6,10 @@ import numpy as np
 from measurements import *
 
 def e(data: measurements.Measurement) -> plt.Figure:
-    t = np.asarray(data.t)
-    i = np.asarray(data.i).astype(int)
-    ρ = np.asarray(data.ρ)
-    dρ = np.asarray(data.dρ)
+    t = np.asarray(data.t, dtype=float)
+    i = np.asarray(data.i, dtype=float)
+    ρ = np.asarray(data.ρ, dtype=float)
+    dρ = np.asarray(data.dρ, dtype=float)
 
     labels = {0: "DSN #0 Goldstone", 1: "DSN #1 Madrid", 2: "DSN #2 Canberra"}
     colors = {0: "r", 1: "g", 2: "b"}
@@ -20,8 +20,10 @@ def e(data: measurements.Measurement) -> plt.Figure:
     fig, axs = plt.subplots(nrows=2, ncols=1, sharex=True, sharey=False, figsize=(12, 8))
 
     for stn in np.unique(i):
-        mask = (i == stn)
-        axs[0].plot(t[mask], ρ[mask],
+        m = (i == stn)
+
+        # range measurements
+        axs[0].plot(t[m], ρ[m],
                 linestyle="-", linewidth=0,
                 marker=".", markersize=2,
                 color=colors.get(int(stn)),
@@ -30,9 +32,8 @@ def e(data: measurements.Measurement) -> plt.Figure:
         axs[0].legend(loc = "upper left")
         axs[0].set_ylabel("Range [km]")
 
-    for stn in np.unique(i):
-        mask = (i == stn)
-        axs[1].plot(t[mask], dρ[mask],
+        # range-rate measurements
+        axs[1].plot(t[m], dρ[m],
                 linestyle="-", linewidth=0,
                 marker=".", markersize=2,
                 color=colors.get(int(stn)),

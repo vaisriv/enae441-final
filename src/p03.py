@@ -6,17 +6,17 @@ import numpy as np
 from measurements import *
 from helpers import *
 
-def a(oe: list, σ: list, σ_a: float, μ: float) -> [np.ndarray, np.ndarray, float, np.ndarray]:
+def a(oe: list, σ_n: list, σ_a: float, μ: float) -> [np.ndarray, np.ndarray, float, np.ndarray]:
     # choose x0 from starting OE
     r0, v0 = system.coe2rv(oe, μ)
     X0_plus = np.hstack([r0, v0])
 
     # choose P0 from starting range variance
-    σ_r, σ_v = [float(x)/σ_a for x in σ]
+    σ_r, σ_v = [float(x)/σ_a for x in σ_n]
     P0_plus = np.diag([σ_r**2]*3 + [σ_v**2]*3)
 
     # choose R0 from measurement noise
-    R0 = np.diag(σ)
+    R0 = np.diag(σ_n)
 
     return [X0_plus, P0_plus, R0]
 

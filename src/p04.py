@@ -6,9 +6,9 @@ import numpy as np
 from measurements import *
 from helpers import *
 
-def a(data: measurements.Measurement, X0_plus: np.ndarray, P0_plus: np.ndarray, R0: np.ndarray, stations: dict, σ_a: float, μ: float, RE: float, OMEGA_E: float, GAMMA0: float) -> [list, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    t_pred, X_minus_hist, P_minus_hist, X_plus_hist, P_plus_hist = propagators.ekf(data, X0_plus, P0_plus, R0, stations, σ_a, μ, RE, OMEGA_E, GAMMA0)
-    return t_pred, X_minus_hist, P_minus_hist, X_plus_hist, P_plus_hist
+def a(data: measurements.Measurement, X0_plus: np.ndarray, P0_plus: np.ndarray, R0: np.ndarray, stations: dict, σ_a: float, μ: float, RE: float, OMEGA_E: float, GAMMA0: float) -> [list, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    t_pred, X_minus_hist, P_minus_hist, X_plus_hist, P_plus_hist, yhat_minus_hist, yhat_plus_hist, resid_pre_hist, resid_post_hist, nis_pre_hist = propagators.ekf(data, X0_plus, P0_plus, R0, stations, σ_a, μ, RE, OMEGA_E, GAMMA0)
+    return t_pred, X_minus_hist, P_minus_hist, X_plus_hist, P_plus_hist, yhat_minus_hist, yhat_plus_hist, resid_pre_hist, resid_post_hist, nis_pre_hist
 
 def b(t_pred: list, X_minus_hist: np.ndarray, P_minus_hist: np.ndarray, X_plus_hist: np.ndarray, P_plus_hist: np.ndarray) -> plt.Figure:
     σ_ms = np.sqrt(np.clip(np.stack([np.diag(P) for P in P_minus_hist]), 0.0, np.inf))  # Nx6

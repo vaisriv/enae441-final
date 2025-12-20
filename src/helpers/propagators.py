@@ -12,7 +12,7 @@ def kf(data: measurements.Measurement, X0_plus: np.ndarray, P0_plus: np.ndarray,
     t = np.asarray(data.t, dtype=float)
 
     # shift epoch so t[0] = 0
-    t0 = t[0]
+    t0 = t.min()
     t = t - t0
 
     # sort by time (for propagation)
@@ -65,7 +65,7 @@ def kf(data: measurements.Measurement, X0_plus: np.ndarray, P0_plus: np.ndarray,
 
     return t, X_minus_hist, P_minus_hist
 
-def ekf(data: measurements.Measurement, X0_plus: np.ndarray, P0_plus: np.ndarray, R0: np.ndarray, stations: dict, σ_a: float, μ: float, RE: float, OMEGA_E: float, GAMMA0: float) -> [list, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+def ekf(data: measurements.Measurement, X0_plus: np.ndarray, P0_plus: np.ndarray, R0: np.ndarray, stations: dict, σ_a: float, μ: float, RE: float, OMEGA_E: float, GAMMA0: float) -> [list, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     # extract arrays from data
     t = np.asarray(data.t, dtype=float)
     i = np.asarray(data.i, dtype=float)
@@ -97,6 +97,7 @@ def ekf(data: measurements.Measurement, X0_plus: np.ndarray, P0_plus: np.ndarray
     yhat_plus_hist  = np.zeros((N, 2))
     resid_pre_hist  = np.zeros((N, 2)) # y - h(X_minus)
     resid_post_hist = np.zeros((N, 2)) # y - h(X_plus)
+    nis_pre_hist = np.zeros(N)
 
     X_plus = X0_plus.copy()
     P_plus = P0_plus.copy()
@@ -143,6 +144,8 @@ def ekf(data: measurements.Measurement, X0_plus: np.ndarray, P0_plus: np.ndarray
         # innovation
         ν = y_k - yhat_minus
         S = H_k @ P_minus @ H_k.T + R0
+        nis_pre = float(ν.T @ np.linalg.inv(S) @ ν)
+        nis_pre_hist[k] = nis_pre
 
         # kalman gain
         # K = P_minus @ H_k.T @ np.linalg.pinv(S)
@@ -167,4 +170,4 @@ def ekf(data: measurements.Measurement, X0_plus: np.ndarray, P0_plus: np.ndarray
         # advance time
         t_prev = t_k
 
-    return t, X_minus_hist, P_minus_hist, X_plus_hist, P_plus_hist, yhat_minus_hist, yhat_plus_hist, resid_pre_hist, resid_post_hist,
+    return t, X_minus_hist, P_minus_hist, X_plus_hist, P_plus_hist, yhat_minus_hist, yhat_plus_hist, resid_pre_hist, resid_post_hist, nis_pre_hist

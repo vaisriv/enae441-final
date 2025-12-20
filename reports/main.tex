@@ -433,8 +433,7 @@ Using your knowledge of the spacecraft's dynamics and the measurements provided 
 		\caption{\( \pm 3 \sigma \) Bounds on Pre- Measurement Covariance \( P_{\bm{\hat{x}}, k}^{-} \) vs. Time \( t \)}
 	\end{figure}
 
-	% TODO: Explanation
-	Answer
+	The plot exhibits sawtooth behavior consistent with a white acceleration process noise model (like the Wiener acceleration we chose). This makes sense, as, without a measurement, the uncertainty can only accumulate. As well, the irregular nature of the plot (with regard to the spacing of each ``wedge") is consistent with varying measurement time-gaps.
 
 \end{hwkProblem}
 
@@ -461,8 +460,7 @@ Using your knowledge of the spacecraft's dynamics and the measurements provided 
 		\caption{\( \pm 3 \sigma \) Bounds on Pre- and Post- Measurement Covariance}
 	\end{figure}
 
-	% TODO: Explanation
-	Answer
+	The post-update bounds are substantially tighter than the pre-update bounds at the same time, because each range/range-rate measurement injects information and reduces uncertainty (via the Kalman gain and Joseph update). The pre-update bounds grow between measurements (propagation), while the post-update bounds exhibit repeated "pull-downs" (corrections) whenever a measurement is processed. Overall, this behavior is consistent with the propagation \& update cycle of an EKF.
 
 	\pagebreak
 
@@ -493,26 +491,40 @@ Using your knowledge of the spacecraft's dynamics and the measurements provided 
 
 	\hwkPart{} \label{hwk:s05a}
 
-	Answer
+	\begin{figure}[H] \label{fig:s05a}
+		\begin{center}
+			\includegraphics[width=0.85\textwidth]{./outputs/figures/s05a.png}
+		\end{center}
+		\caption{Post-Fit Measurement Residuals \( \delta \bm{Y} \) vs. Time \( t \)}
+	\end{figure}
+
+	\pagebreak
 
 	\hwkPart{} \label{hwk:s05b}
 
-	Answer
+	\inputminted{python}{./outputs/text/s05b.txt}
+
+	Yes, the residuals strongly support that the estimated state is correct and that the filter is well-tuned/consistent. There are three key pieces of evidence to support this claim:
+	\begin{itemize}
+		\item The post-fit residuals plotted in \hyperref[fig:s05a]{Part A} appear zero-mean and noise-like, without obvious drifts or station-dependent biases.
+		\item Quantitatively, the post-fit RMS residuals are the same order of magnitude (and scale) of the measurement noise:
+			\subitem RMS range residual \( \approx 0.970 \unit{\m} \)
+			\subitem RMS range-rate residual \( \approx 0.817 \unit{\cm\per\s} \)
+		\item The mean pre-fit NIS is \( \approx 1.950 \) for \( df = 2 \), which is close to the expected value \( \left(\approx 2\right) \) for a statistically consistent filter with 2 measurement dimensions.
+	\end{itemize}
 
 	\hwkPart{} \label{hwk:s05c}
 
 	\begin{figure}[H] \label{fig:s05c}
 		\begin{center}
-			\includegraphics[width=0.65\textwidth]{./outputs/figures/s05c.png}
+			\includegraphics[width=0.85\textwidth]{./outputs/figures/s05c.png}
 		\end{center}
-		\caption{Example}
+		\caption{Estimated State \( \bm{\mu}_{\bm{\hat{x}}, k}^{+} \) with \( \pm 3 \sigma \) Bounds vs. Time \( t \)}
 	\end{figure}
-
-	Answer
 
 	\hwkPart{} \label{hwk:s05d}
 
-	Answer
+	\inputminted{python}{./outputs/text/s05d.txt}
 
 \end{hwkProblem}
 
@@ -529,7 +541,16 @@ Using your knowledge of the spacecraft's dynamics and the measurements provided 
 
 	\hwkSol{} \label{hwk:s06}
 
-	Answer
+	\textit{N/A?}
+
+	I am honestly not sure what to put here, as I was fairly confident in my solution throughout the entirety of my time working on this project. Especially once I computed my result for \hyperref[hwk:p05b]{Problem 5, Part B}, any worry that my solution was inadequate was completely gone.
+
+	I attribute the ease of development on this project to three things:
+	\begin{enumerate}
+		\item Thorough structuring and architecting of my planned solution before implementation.
+		\item Strictly typing all variables, objects, and functions throughout my codebase (thank you \href{https://typing.python.org/en/latest/index.html}{Python 3.13}).
+		\item Modularization/functional-decomposition of my codebase.
+	\end{enumerate}
 
 \end{hwkProblem}
 
@@ -576,6 +597,9 @@ See the \href{https://www.github.com/vaisriv/enae441-final/blob/main/src}{full s
 
 \subsection*{\mintinline{bash}{./src/p04.py}}
 \inputminted{python}{./src/p04.py}
+
+\subsection*{\mintinline{bash}{./src/p05.py}}
+\inputminted{python}{./src/p05.py}
 
 \subsection*{\mintinline{bash}{./src/helpers/propagators.py}}
 \inputminted{python}{./src/helpers/propagators.py}
