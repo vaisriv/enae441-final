@@ -8,7 +8,7 @@ from measurements import *
 
 def coe2rv(oe: list, μ:float) -> [np.ndarray, np.ndarray]:
     # a in km, angles in rad
-    a, e, i, Ω, ω, ν = [float(x) for x in oe]
+    a, e, i, ω, Ω, ν = [float(x) for x in oe]
 
     # Semi-latus rectum
     p = a * (1 - e**2)
@@ -62,3 +62,54 @@ def eom_with_stm(t: float, y: list, μ: float) -> np.ndarray:
     dΦ = A @ Φ
 
     return np.concatenate([v, a, dΦ.reshape(-1)])
+
+def site_ecef(stations: dict, RE: float) -> dict:
+    R_ecef = {}
+
+    for idx, (ϕ, λ) in stations.items():
+        R_ecef[idx] = RE * np.array([
+            np.cos(ϕ)*np.cos(λ),
+            np.cos(ϕ)*np.sin(λ),
+            np.sin(ϕ)
+        ])
+
+    return R_ecef
+
+def site_eci(station_idx: int, t: float, R_ecef: dict, OMEGA_E: float, GAMMA0: float) -> [np.ndarray, np.ndarray]:
+    γ = GAMMA0 + OMEGA_E * t
+    ω = np.array([0.0, 0.0, OMEGA_E])
+
+    R_ecef_eci = sp.spatial.transform.Rotation.from_euler("Z", -γ)
+    R_site = R_ecef_eci.as_matrix() @ R_ecef[int(station_idx)]
+
+    dR_site = np.cross(ω, R_site)
+
+    return R_site, dR_site
+
+def meas_and_jacobian(X: list, station_idx: int, t: float, R_ecef: dict, OMEGA_E: float, GAMMA0: float) -> [np.ndarray, np.ndarray]:
+    r = X[0:3]
+    v = X[3:6]
+    R_site, dR_site = site_eci(station_idx, t, R_ecef, OMEGA_E, GAMMA0)
+
+    ρ_vec = r - R_site
+    ρ = np.linalg.norm(ρ_vec)
+    u = ρ_vec / ρ
+
+    v_rel = v - dR_site
+    dρ = u @ v_rel
+
+    yhat = np.array([ρ, dρ])
+    I3 = np.eye(3)
+
+    # H (2x6)
+    H_ρ_r = u.reshape(1,3)
+    H_ρ_v = np.zeros((1,3))
+    H_dρ_v = u.reshape(1,3)
+    H_dρ_r = (1.0/ρ) * (v_rel.reshape(1,3) @ (I3 - np.outer(u, u)))
+
+    H = np.block([
+        [H_ρ_r,  H_ρ_v],
+        [H_dρ_r, H_dρ_v],
+    ])
+
+    return yhat, H

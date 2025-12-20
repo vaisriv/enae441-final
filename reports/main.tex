@@ -86,7 +86,9 @@ where \( \bm{R}_{\text{site}, i} \) is the location of the DSN station also in t
 
 Using your knowledge of the spacecraft's dynamics and the measurements provided by the DSN, generate a report which culminates in an estimate of the spacecraft's state over time. To help facilitate your progress, please generate your report in the following order, answering the following intermediate questions:
 
-\begin{hwkProblem*}{1}{Problem Setup} \label{hwk:p01}
+\newpage
+
+\begin{hwkProblem}{1}{Problem Setup} \label{hwk:p01}
 
 	\begin{enumerate}[label=\alph*.]
 		\item \label{hwk:p01a} Express the non-linear system in continuous time state-space form, clearly defining the vectors \( \fn{\bm{f}}[\fn{X}[t]] \) and \( \fn{\bm{h}}[\fn{X}[t]] \)
@@ -239,14 +241,14 @@ Using your knowledge of the spacecraft's dynamics and the measurements provided 
 
 	\begin{figure}[H] \label{fig:s01e}
 		\begin{center}
-			\includegraphics[width=0.65\textwidth]{./outputs/figures/s01e.png}
+			\includegraphics[width=0.85\textwidth]{./outputs/figures/s01e.png}
 		\end{center}
 		\caption{DSN Range [\unit{\km}] vs. Time [\unit{\s}]}
 	\end{figure}
 
-\end{hwkProblem*}
+\end{hwkProblem}
 
-\begin{hwkProblem*}{2}{Plan Filter Implementation} \label{hwk:p02}
+\begin{hwkProblem}{2}{Plan Filter Implementation} \label{hwk:p02}
 
 	Provide pseudocode from which you will base your extended Kalman filter implementation. Highlight the major steps in your algorithm and any noteworthy modifications or subtle details required for this problem that you want the grades to be aware of. Be comprehensive, as this is what the grading team will primarily reference if the results/plots don't quite look right.
 
@@ -371,9 +373,9 @@ Using your knowledge of the spacecraft's dynamics and the measurements provided 
 		\caption{(Pseudo) Code Flowchart}
 	\end{figure}
 
-\end{hwkProblem*}
+\end{hwkProblem}
 
-\begin{hwkProblem*}{3}{Pure Prediction} \label{hwk:p03}
+\begin{hwkProblem}{3}{Pure Prediction} \label{hwk:p03}
 
 	\begin{enumerate}[label=\alph*.]
 		\item \label{hwk:p03a} Specify your choice of \( \bm{x}_{0} \), \( P_{0} \), \( Q_{0} \), and \( R_{0} \). Explain your reasoning. (For \( \bm{x}_{0} \), express in cartesian coordinates.)
@@ -392,14 +394,14 @@ Using your knowledge of the spacecraft's dynamics and the measurements provided 
 
 	\( P_{0} \) is chosen to be a diagonal covariance matrix, with the first 3 terms being the range noise uncertainty scaled by the tuning ratio:
 	\[
-		\sigma_{r}^{2} = \left(\frac{\sigma_{\rho}}{\sigma_{a}}\right)^{2} = \left(\frac{\num{1e-6}}{\num{1e-9}}\left[\unit{\km}\right]\right)^{2}
+		\sigma_{r}^{2} = \left(\frac{\sigma_{\rho}}{\sigma_{a}}\right)^{2} = \left(\frac{\num{1e-6}}{\num{1e-6}}\left[\unit{\km}\right]\right)^{2}
 	\]
 	and the final 3 terms being the range-rate noise uncertainty scaled by the tuning ratio:
 	\[
-		\sigma_{v}^{2} = \left(\frac{\sigma_{\dot{\rho}}}{\sigma_{a}}\right)^{2} = \left(\frac{\num{1e-10}}{\num{1e-9}}\left[\unit{\km\per\s}\right]\right)^{2}
+		\sigma_{v}^{2} = \left(\frac{\sigma_{\dot{\rho}}}{\sigma_{a}}\right)^{2} = \left(\frac{\num{1e-10}}{\num{1e-6}}\left[\unit{\km\per\s}\right]\right)^{2}
 	\]
 
-	\( Q_{0} \) is chosen to be the short-step approximation:
+	\( Q_{0} \) is chosen to be the first-order Wiener discretized continuous white noise acceleration model:
 	\[
 		Q_k \approx q_a\left[\begin{array}{cc}
 				\frac{\Delta t^3}{3} I_3 & \frac{\Delta t^2}{2} I_3 \\
@@ -422,28 +424,26 @@ Using your knowledge of the spacecraft's dynamics and the measurements provided 
 
 	Implementation can be viewed in the \hyperref[code:final]{Python files} embedded at the end of the report.
 
-	\pagebreak
-
 	\hwkPart{} \label{hwk:s03c}
 
 	\begin{figure}[H] \label{fig:s03c}
 		\begin{center}
-			\includegraphics[width=0.65\textwidth]{./outputs/figures/s03c.png}
+			\includegraphics[width=0.85\textwidth]{./outputs/figures/s03c.png}
 		\end{center}
-		\caption{\( \pm 3 \sigma \) Bounds on Covariance \( P_{\bm{\hat{x}}, k}^{-} \) vs. Time \( t \)}
+		\caption{\( \pm 3 \sigma \) Bounds on Pre- Measurement Covariance \( P_{\bm{\hat{x}}, k}^{-} \) vs. Time \( t \)}
 	\end{figure}
 
 	% TODO: Explanation
 	Answer
 
-\end{hwkProblem*}
+\end{hwkProblem}
 
-\begin{hwkProblem*}{4}{Measurement Updates} \label{hwk:p04}
+\begin{hwkProblem}{4}{Measurement Updates} \label{hwk:p04}
 
 	\begin{enumerate}[label=\alph*.]
 		\item \label{hwk:p04a} Implement the measurement update step of the extended Kalman Filter.
 		\item \label{hwk:p04b} Plot the pre- and post-measurement update \( \pm 3 \sigma \) bounds on the same plot. Explain any differences.
-		\item \label{hwk:p04c} Plot the difference between the pre-and post-measurement update state estimates, \( \fn{\bm{\mu}_{\bm{\hat{x}}, k}^{+}}[t_{k}] - \fn{\bm{\mu}_{\bm{\hat{x}}, k}^{-}}[t_{k}] \), inside of the pre-measurement covariance \( \pm 3 \sigma \) bounds \( \fn{P_{\bm{\hat{x}}, k}^{+}}[t_{k}] \).
+		\item \label{hwk:p04c} Plot the difference between the pre- and post-measurement update state estimates, \( \fn{\bm{\mu}_{\bm{\hat{x}}, k}^{+}}[t_{k}] - \fn{\bm{\mu}_{\bm{\hat{x}}, k}^{-}}[t_{k}] \), inside of the pre-measurement covariance \( \pm 3 \sigma \) bounds \( \fn{P_{\bm{\hat{x}}, k}^{+}}[t_{k}] \).
 	\end{enumerate}
 
 	\hwkSol{} \label{hwk:s04}
@@ -456,25 +456,28 @@ Using your knowledge of the spacecraft's dynamics and the measurements provided 
 
 	\begin{figure}[H] \label{fig:s04b}
 		\begin{center}
-			\includegraphics[width=0.65\textwidth]{./outputs/figures/s04b.png}
+			\includegraphics[width=0.85\textwidth]{./outputs/figures/s04b.png}
 		\end{center}
-		\caption{Example}
+		\caption{\( \pm 3 \sigma \) Bounds on Pre- and Post- Measurement Covariance}
 	\end{figure}
 
+	% TODO: Explanation
 	Answer
+
+	\pagebreak
 
 	\hwkPart{} \label{hwk:s04c}
 
 	\begin{figure}[H] \label{fig:s04c}
 		\begin{center}
-			\includegraphics[width=0.65\textwidth]{./outputs/figures/s04c.png}
+			\includegraphics[width=0.85\textwidth]{./outputs/figures/s04c.png}
 		\end{center}
-		\caption{Example}
+		\caption{Difference Between Pre- and Post-Measurement Update State Estimates}
 	\end{figure}
 
-\end{hwkProblem*}
+\end{hwkProblem}
 
-\begin{hwkProblem*}{5}{Filter Solutions} \label{hwk:p05}
+\begin{hwkProblem}{5}{Filter Solutions} \label{hwk:p05}
 
 	\begin{enumerate}[label=\alph*.]
 		\item \label{hwk:p05a} With your EKF implemented, run the simulation through to completion and compute the post-fit measurement residuals as a function of time via:
@@ -511,9 +514,9 @@ Using your knowledge of the spacecraft's dynamics and the measurements provided 
 
 	Answer
 
-\end{hwkProblem*}
+\end{hwkProblem}
 
-\begin{hwkProblem*}{6}{Debugging Efforts \textit{(Optional)}} \label{hwk:p06}
+\begin{hwkProblem}{6}{Debugging Efforts \textit{(Optional)}} \label{hwk:p06}
 
 	Use this section to outline any of your debugging efforts for if things aren't going your way. This is a good place to earn some partial credit. This should be a ``research'' log of what experiments you performed and why. A list of guiding questions if your stuck include:
 	\begin{enumerate}
@@ -528,9 +531,9 @@ Using your knowledge of the spacecraft's dynamics and the measurements provided 
 
 	Answer
 
-\end{hwkProblem*}
+\end{hwkProblem}
 
-\begin{hwkProblem*}{7}{Challenge Orbit \textit{(Bonus)}} \label{hwk:p07}
+\begin{hwkProblem}{7}{Challenge Orbit \textit{(Bonus)}} \label{hwk:p07}
 
 	Perform a second analysis with the more difficult dataset \mintinline{python}{Project-Measurements-Hard.npy}. Use
 	\[
@@ -556,7 +559,7 @@ Using your knowledge of the spacecraft's dynamics and the measurements provided 
 
 	Answer
 
-\end{hwkProblem*}
+\end{hwkProblem}
 
 \section*{Code} \label{code:final}
 
@@ -570,6 +573,9 @@ See the \href{https://www.github.com/vaisriv/enae441-final/blob/main/src}{full s
 
 \subsection*{\mintinline{bash}{./src/p03.py}}
 \inputminted{python}{./src/p03.py}
+
+\subsection*{\mintinline{bash}{./src/p04.py}}
+\inputminted{python}{./src/p04.py}
 
 \subsection*{\mintinline{bash}{./src/helpers/propagators.py}}
 \inputminted{python}{./src/helpers/propagators.py}

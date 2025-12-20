@@ -1,5 +1,4 @@
 # libs
-from scipy.integrate import solve_ivp
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -21,30 +20,30 @@ def a(oe: list, σ: list, σ_a: float, μ: float) -> [np.ndarray, np.ndarray, fl
 
     return [X0_plus, P0_plus, R0]
 
+def b(data: measurements.Measurement, X0_plus: np.ndarray, P0_plus: np.ndarray, σ_a: float, μ: float) -> [list, np.ndarray, np.ndarray]:
+    t_pred, X_minus_hist, P_minus_hist = propagators.kf(data, X0_plus, P0_plus, σ_a, μ)
+    return t_pred, X_minus_hist, P_minus_hist
 
-def c(data: measurements.Measurement, X0_plus: np.ndarray, P0_plus: np.ndarray, σ_a: float, μ: float) -> plt.Figure:
-    t_pred, X_minus_hist, P_minus_hist = propagators.predict_only(data, X0_plus, P0_plus, σ_a, μ)
-
+def c(t_pred: list, X_minus_hist: np.ndarray, P_minus_hist: np.ndarray) -> plt.Figure:
     σs = np.sqrt(np.clip(np.stack([np.diag(P) for P in P_minus_hist]), 0.0, np.inf))  # Nx6
     bounds = 3.0 * σs  # Nx6
 
     state_names = ["x [km]", "y [km]", "z [km]", "vx [km/s]", "vy [km/s]", "vz [km/s]"]
     colors = {0: "r", 1: "g", 2: "b"}
 
-    fig, axs = plt.subplots(nrows=3, ncols=2, sharex=True, sharey=False)
+    fig, axs = plt.subplots(nrows=3, ncols=2, sharex=True, sharey=False, figsize=(12, 8))
 
     for j in range(len(state_names)):
         ax = axs[j%3, int(j/3)]
         ax.fill_between(t_pred,  bounds[:, j], -bounds[:, j],
                         color = colors.get(j%3),
-                        label=f"±3σ {state_names[j]}",
                         alpha=0.5)
         ax.grid(True, alpha=0.3)
-        ax.legend(loc="upper left")
+        ax.set_title(f"±3σ {state_names[j]}")
 
     fig.supxlabel("Time [s]")
-    fig.supylabel("Error bound (centered at 0)")
-    fig.suptitle("Prediction covariance bounds (±3σ)")
+    fig.supylabel("Error Bound (Centered at 0)")
+    fig.suptitle("Pre-Update Prediction Covariance Bounds (±3σ)")
     fig.tight_layout()
 
     return fig
