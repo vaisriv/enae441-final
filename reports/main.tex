@@ -15,8 +15,8 @@
 
 \hwkTitle{Final Project}
 \hwkSubTitle{Extended Kalman Filter}
-\hwkDueDate{2025-12-16}
-\hwkDueTime{12:30:00}
+\hwkDueDate{2025-12-20}
+\hwkDueTime{9:30:00}
 \hwkClass{ENAE 441 - 0101}
 \hwkClassTime{09:30:00}
 \hwkInstructor{Dr. Martin}
@@ -578,7 +578,56 @@ Using your knowledge of the spacecraft's dynamics and the measurements provided 
 
 	\hwkSol{} \label{hwk:s07}
 
-	Answer
+	\begin{figure}[H] \label{fig:s07-01e}
+		\begin{center}
+			\includegraphics[width=0.85\textwidth]{./outputs/figures/s07-01e.png}
+		\end{center}
+		\caption{DSN Range [\unit{\km}] vs. Time [\unit{\s}]}
+	\end{figure}
+
+	\inputminted{python}{./outputs/text/s03a.txt}
+
+	\begin{figure}[H] \label{fig:s07-03c}
+		\begin{center}
+			\includegraphics[width=0.85\textwidth]{./outputs/figures/s07-03c.png}
+		\end{center}
+		\caption{\( \pm 3 \sigma \) Bounds on Pre- Measurement Covariance \( P_{\bm{\hat{x}}, k}^{-} \) vs. Time \( t \)}
+	\end{figure}
+
+	\begin{figure}[H] \label{fig:s07-04b}
+		\begin{center}
+			\includegraphics[width=0.85\textwidth]{./outputs/figures/s07-04b.png}
+		\end{center}
+		\caption{\( \pm 3 \sigma \) Bounds on Pre- and Post- Measurement Covariance}
+	\end{figure}
+
+	\begin{figure}[H] \label{fig:s07-04c}
+		\begin{center}
+			\includegraphics[width=0.85\textwidth]{./outputs/figures/s07-04c.png}
+		\end{center}
+		\caption{Difference Between Pre- and Post-Measurement Update State Estimates}
+	\end{figure}
+
+	\begin{figure}[H] \label{fig:s07-05a}
+		\begin{center}
+			\includegraphics[width=0.85\textwidth]{./outputs/figures/s07-05a.png}
+		\end{center}
+		\caption{Post-Fit Measurement Residuals \( \delta \bm{Y} \) vs. Time \( t \)}
+	\end{figure}
+
+	\inputminted{python}{./outputs/text/s07-05b.txt}
+
+	\begin{figure}[H] \label{fig:s07-05c}
+		\begin{center}
+			\includegraphics[width=0.85\textwidth]{./outputs/figures/s07-05c.png}
+		\end{center}
+		\caption{Estimated State \( \bm{\mu}_{\bm{\hat{x}}, k}^{+} \) with \( \pm 3 \sigma \) Bounds vs. Time \( t \)}
+	\end{figure}
+
+	\inputminted{python}{./outputs/text/s07-05d.txt}
+
+	\subsection*{\mintinline{bash}{./src/hard.py}}
+	\inputminted{python}{./src/hard.py}
 
 \end{hwkProblem}
 

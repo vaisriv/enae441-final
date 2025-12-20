@@ -6,7 +6,7 @@ import numpy as np
 from measurements import *
 from helpers import *
 
-def a(oe: list, σ_n: list, σ_a: float, μ: float) -> [np.ndarray, np.ndarray, float, np.ndarray]:
+def a(oe: list, σ_n: list, σ: list, σ_a: float, μ: float) -> [np.ndarray, np.ndarray, float, np.ndarray]:
     # choose x0 from starting OE
     r0, v0 = system.coe2rv(oe, μ)
     X0_plus = np.hstack([r0, v0])
